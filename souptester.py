@@ -1,6 +1,10 @@
 ## TODO:
 ## add scraping from url rather than file
 ## add MEI scraping
+## add messages for if SM is not cambium
+## add messages for if SM is down or otherwise unable to connect
+## add in next steps to work log
+
 
 
 
