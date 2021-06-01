@@ -13,7 +13,7 @@ import re
 ## opens a test html file normally retrieved through a GET request
 ## and prints its contents
 ## Scrapes: PowerLevel, SSR, SNR, and Beacons
-def SMScrape():
+def CambiumSMScrape():
     with open('.\Test_SM.html') as website:
         smsoup = BeautifulSoup(website, 'html.parser')
 
@@ -40,6 +40,7 @@ def SMScrape():
 
 ## opens a test sugar page to pull info from
 ## Scrapes: speedPlan, apType, smType
+
 def SugarScrape():
     with open('.\sugartestpage.html') as sugarpage:
         sugarsoup = BeautifulSoup(sugarpage, 'html.parser')
@@ -104,34 +105,55 @@ def SNRConditionCheck(snr, speedPlan):
         listsnr = snr.split('/')
         snrv = int(re.sub(r'[^\d.]+', '', listsnr[0]))
         snrh = int(re.sub(r'[^\d.]+', '', listsnr[1]))
-        snr = 999
+        if ((snrv <= 15) or (snrh <= 15)):
+            print (f'snr of {snrv}V/{snrh}H out of spec')
+        elif ((speedPlan == 10) or (speedPlan == 20)):
+            if ((snrv >= 17) or (snrh >= 17)):
+                print(f'snr of {snrv}V/{snrh}H in spec for speedPlan {speedPlan}Mbps')
+            else:
+                print(f'snr of {snrv}V/{snrh}H out of spec for speedPlan {speedPlan}Mbps')
+        elif (speedPlan == 25):
+            if ((snrv >= 22) or (snrh >= 22)):
+                print(f'snr of {snrv}V/{snrh}H in spec for speedPlan {speedPlan}Mbps')
+            else:
+                print(f'snr of {snrv}V/{snrh}H out of spec for speedPlan {speedPlan}Mbps')
+        elif (speedPlan == 50):
+            if ((snrv >= 27) or (snrh >= 27)):
+                print(f'snr of {snrv}V/{snrh}H in spec for speedPlan {speedPlan}Mbps')
+            else:
+                print(f'snr of {snrv}V/{snrh}H out of spec for speedPlan {speedPlan}Mbps')
+        elif (speedPlan == 100):
+            if ((snrv >= 30) or (snrh >= 30)):
+                print(f'snr of {snrv}V/{snrh}H in spec for speedPlan {speedPlan}Mbps')
+            else:
+                print(f'snr of {snrv}V/{snrh}H out of spec for speedPlan {speedPlan}Mbps')
     else:
         snr = int(re.sub(r'[^\d.]+', '', snr))
-        snrv = 999
-        snrh = 999
+        if ((snrv <= 15) or (snrh <= 15)):
+            print (f'snr of {snrv}V/{snrh}H out of spec')
+        elif ((speedPlan == 10) or (speedPlan == 20)):
+            if (snr >= 17):
+                print(f'snr of {snr} in spec for speedPlan {speedPlan}Mbps')
+            else:
+                print(f'snr of {snr} out of spec for speedPlan {speedPlan}Mbps')
+        elif (speedPlan == 25):
+            if (snr >= 22):
+                print(f'snr of {snr} in spec for speedPlan {speedPlan}Mbps')
+            else:
+                print(f'snr of {snr} out of spec for speedPlan {speedPlan}Mbps')
+        elif (speedPlan == 50):
+            if (snr >= 27):
+                print(f'snr of {snr} in spec for speedPlan {speedPlan}Mbps')
+            else:
+                print(f'snr of {snr} out of spec for speedPlan {speedPlan}Mbps')
+        elif (speedPlan == 100):
+            if (snr >= 30):
+                print(f'snr of {snr} in spec for speedPlan {speedPlan}Mbps')
+            else:
+                print(f'snr of {snr} out of spec for speedPlan {speedPlan}Mbps')
+
     ## This elif tree could be split into 2 under the abode if statement to clean up output
-    if ((snrv <= 15) or (snrh <= 15) or (snr <= 15)):
-        print (f'snr of {snrv}V/{snrh}H or {snr} out of spec')
-    elif ((speedPlan == 10) or (speedPlan == 20)):
-        if ((snrv >= 17) or (snrh >= 17) or (snr <= 17)):
-            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedPlan {speedPlan}Mbps')
-        else:
-            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedPlan {speedPlan}Mbps')
-    elif (speedPlan == 25):
-        if ((snrv >= 22) or (snrh >= 22) or (snr <= 22)):
-            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedPlan {speedPlan}Mbps')
-        else:
-            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedPlan {speedPlan}Mbps')
-    elif (speedPlan == 50):
-        if ((snrv >= 27) or (snrh >= 27) or (snr <= 27)):
-            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedPlan {speedPlan}Mbps')
-        else:
-            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedPlan {speedPlan}Mbps')
-    elif (speedPlan == 100):
-        if ((snrv >= 30) or (snrh >= 30) or (snr <= 30)):
-            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedPlan {speedPlan}Mbps')
-        else:
-            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedPlan {speedPlan}Mbps')
+
 
 
 ## condition checkers for automatic out of spec detection
@@ -148,8 +170,9 @@ def BeaconsConditionCheck(beacons):
 
 
 def main():
-    powerlevel, ssr, snr, beacons = SMScrape()
     speedPlan, isMedusa, isCambium = SugarScrape()
+    if isCambium:
+        powerlevel, ssr, snr, beacons = CambiumSMScrape()
     PowerLevelConditionCheck(powerlevel, speedPlan)
     SSRConditionCheck(ssr)
     SNRConditionCheck(snr, speedPlan)
