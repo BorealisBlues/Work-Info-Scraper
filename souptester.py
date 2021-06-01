@@ -1,6 +1,7 @@
 ## TODO:
 ## add scraping from url rather than file
 ## add checks for Medusa AP
+## Split conditionCheck elif trees into two parts under first if statement to clean up output
 
 
 
@@ -38,39 +39,56 @@ def SMScrape():
         return(powerlevel, ssr, snr, beacons)
 
 ## opens a test sugar page to pull info from
-## Scrapes: Speedplan, 
+## Scrapes: speedPlan, apType, smType
 def SugarScrape():
     with open('.\sugartestpage.html') as sugarpage:
         sugarsoup = BeautifulSoup(sugarpage, 'html.parser')
 
-        ## finds Cx speedplan using tag value
-        speedplan = sugarsoup.find(sugar='slot361b').text
-        speedplan = int(re.sub(r'[^\d.]+', '', speedplan))
-        print ('speedplan is: ',speedplan)
-        return (speedplan)
+        ## finds Cx speedPlan using tag value
+        speedPlan = sugarsoup.find(sugar='slot361b').text
+        speedPlan = int(re.sub(r'[^\d.]+', '', speedPlan))
+        print ('speedPlan is: ',speedPlan)
+
+        apType = sugarsoup.find(id='aptype_c').text
+        print(f'AP is {apType}')
+        if ('450' in apType):
+            isMedusa = True
+        else:
+            isMedusa = False
+            
+        smType = sugarsoup.find(class_='oddListRowS1').find_all('td')
+        print(smType[2].text)
+        if (smType[2].text == 'CAMBIUM'):
+            isCambium = True
+            print(isCambium)
+        else:
+            isCambium = False
+            print(isCambium)
+        
+        return (speedPlan, isMedusa, isCambium)
 
 ## condition checker for power level
 ## substitutes using regex all non digits to nothing
-def PowerLevelConditionCheck(powerlevel, speedplan):
+def PowerLevelConditionCheck(powerlevel, speedPlan):
     if (powerlevel >= 80):
-        print (f'powerlevel of -{powerlevel} out of spec for speedplan {speedplan} Mbps')
-    elif ((speedplan == 10) or (speedplan == 20)):
+        print (f'powerlevel of -{powerlevel} out of spec for speedPlan {speedPlan} Mbps')
+    elif ((speedPlan == 10) or (speedPlan == 20)):
         if (powerlevel <= 75):
-            print (f'powerlevel of -{powerlevel} in spec for speedplan {speedplan} Mbps')
+            print (f'powerlevel of -{powerlevel} in spec for speedPlan {speedPlan} Mbps')
         else:
-            print (f'powerlevel of -{powerlevel} out of spec for speedplan {speedplan} Mbps')
-    elif (speedplan == 25):
+            print (f'powerlevel of -{powerlevel} out of spec for speedPlan {speedPlan} Mbps')
+    elif (speedPlan == 25):
         if (powerlevel <= 73):
-            print (f'powerlevel of -{powerlevel} in spec for speedplan {speedplan} Mbps')
+            print (f'powerlevel of -{powerlevel} in spec for speedPlan {speedPlan} Mbps')
         else:
-            print (f'powerlevel of -{powerlevel} out of spec for speedplan {speedplan} Mbps')
-    elif ((speedplan == 50) or (speedplan == 100)):
+            print (f'powerlevel of -{powerlevel} out of spec for speedPlan {speedPlan} Mbps')
+    elif ((speedPlan == 50) or (speedPlan == 100)):
         if (powerlevel <= 64):
-            print (f'powerlevel of -{powerlevel} in spec for speedplan {speedplan} Mbps')
+            print (f'powerlevel of -{powerlevel} in spec for speedPlan {speedPlan} Mbps')
         else:
-            print (f'powerlevel of -{powerlevel} out of spec for speedplan {speedplan} Mbps')
+            print (f'powerlevel of -{powerlevel} out of spec for speedPlan {speedPlan} Mbps')
     else:
-        print (f'error determing speedplan: {speedplan} or power level: {powerlevel}')
+        print (f'error determing speedPlan: {speedPlan} or power level: {powerlevel}')
 
 
 ## ssr condition checker
@@ -81,7 +99,7 @@ def SSRConditionCheck(ssr):
         print(f'ssr of {ssr} out of spec')
 
 ## snr condition checker
-def SNRConditionCheck(snr, speedplan):
+def SNRConditionCheck(snr, speedPlan):
     if ('/' in snr):
         listsnr = snr.split('/')
         snrv = int(re.sub(r'[^\d.]+', '', listsnr[0]))
@@ -91,29 +109,29 @@ def SNRConditionCheck(snr, speedplan):
         snr = int(re.sub(r'[^\d.]+', '', snr))
         snrv = 999
         snrh = 999
-        
+    ## This elif tree could be split into 2 under the abode if statement to clean up output
     if ((snrv <= 15) or (snrh <= 15) or (snr <= 15)):
         print (f'snr of {snrv}V/{snrh}H or {snr} out of spec')
-    elif ((speedplan == 10) or (speedplan == 20)):
+    elif ((speedPlan == 10) or (speedPlan == 20)):
         if ((snrv >= 17) or (snrh >= 17) or (snr <= 17)):
-            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedplan {speedplan}Mbps')
+            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedPlan {speedPlan}Mbps')
         else:
-            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedplan {speedplan}Mbps')
-    elif (speedplan == 25):
+            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedPlan {speedPlan}Mbps')
+    elif (speedPlan == 25):
         if ((snrv >= 22) or (snrh >= 22) or (snr <= 22)):
-            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedplan {speedplan}Mbps')
+            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedPlan {speedPlan}Mbps')
         else:
-            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedplan {speedplan}Mbps')
-    elif (speedplan == 50):
+            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedPlan {speedPlan}Mbps')
+    elif (speedPlan == 50):
         if ((snrv >= 27) or (snrh >= 27) or (snr <= 27)):
-            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedplan {speedplan}Mbps')
+            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedPlan {speedPlan}Mbps')
         else:
-            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedplan {speedplan}Mbps')
-    elif (speedplan == 100):
+            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedPlan {speedPlan}Mbps')
+    elif (speedPlan == 100):
         if ((snrv >= 30) or (snrh >= 30) or (snr <= 30)):
-            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedplan {speedplan}Mbps')
+            print(f'snr of {snrv}V/{snrh}H or {snr} in spec for speedPlan {speedPlan}Mbps')
         else:
-            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedplan {speedplan}Mbps')
+            print(f'snr of {snrv}V/{snrh}H or {snr} out of spec for speedPlan {speedPlan}Mbps')
 
 
 ## condition checkers for automatic out of spec detection
@@ -131,10 +149,10 @@ def BeaconsConditionCheck(beacons):
 
 def main():
     powerlevel, ssr, snr, beacons = SMScrape()
-    speedplan = SugarScrape()
-    PowerLevelConditionCheck(powerlevel, speedplan)
+    speedPlan, isMedusa, isCambium = SugarScrape()
+    PowerLevelConditionCheck(powerlevel, speedPlan)
     SSRConditionCheck(ssr)
-    SNRConditionCheck(snr, speedplan)
+    SNRConditionCheck(snr, speedPlan)
     BeaconsConditionCheck(beacons)
 
 
