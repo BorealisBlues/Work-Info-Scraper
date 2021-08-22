@@ -1,9 +1,9 @@
 ## TODO:
 ## add scraping from url rather than file
-## add MEI scraping
+## have scrape information returned from functions in form of an object with values, rather than as a list of values
 ## add messages for if SM is not cambium
 ## add messages for if SM is down or otherwise unable to connect
-## add in next steps to work log
+## add in next Troubleshooting steps to work log
 
 
 
@@ -38,6 +38,9 @@ def CambiumSMScrape():
         beacons = smsoup.find(id='beaconsPercentReceivedGui').text
         print('Beacons: ',beacons)
         beacons = int(re.sub(r'[^\d.]+', '', beacons))
+
+        mei = smsoup.find(id='LinkStatusMain').text
+        print('MEI: ',mei)
 
         return(powerlevel, ssr, snr, beacons)
 
@@ -170,10 +173,6 @@ def SNRConditionCheck(snr, speedPlan, isMedusa):
             print ('ERROR determining SNR')
         
 
-    ## This elif tree could be split into 2 under the abode if statement to clean up output
-
-
-
 ## condition checkers for automatic out of spec detection
 def BeaconsConditionCheck(beacons):
     if (int(beacons) < 98):
@@ -181,6 +180,11 @@ def BeaconsConditionCheck(beacons):
     else:
         print(f'Beacons: {beacons} // in spec')
 
+def MeiConditionCheck(mei):
+    if (('full' not in mei) or ('10 ' in mei)):
+        print ('MEI not in spec')
+    else:
+        print ('MEI in Spec')
 
 
 
